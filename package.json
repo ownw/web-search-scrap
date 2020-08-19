@@ -1,6 +1,6 @@
 {
   "name": "@mazoutzecat/web-search-scrap",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scrap any content on any website that has a search bar",
   "main": "index.js",
   "scripts": {

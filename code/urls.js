@@ -4,7 +4,7 @@ require("./pageToScrapDoc");
 
 /**
  * Loads all files in the target directory
- * @type {Promise<PageToScrap[]>}
+ * @type {function(dirTaget: string): Promise<PageToScrap[]>}
  */
 const pagesToScrap = (async(dirTarget) => {
     try{
