@@ -3,7 +3,7 @@ const path = require("path");
 require("./pageToScrapDoc");
 
 /**
- * Loads all files in the target directory
+ * Loads all files in the target directory (should be .json files)
  * @type {function(dirTaget: string): Promise<PageToScrap[]>}
  */
 const pagesToScrap = (async(dirTarget) => {
