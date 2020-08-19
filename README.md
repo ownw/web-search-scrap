@@ -121,15 +121,16 @@ Your main file could look like this:
 
 You can also directly use the results generated:
 
-    const {scrap, pagesToScrap} = require('@mazoutzecat/web-search-scrap');
+    const {scrap} = require('@mazoutzecat/web-search-scrap');
+    const targetWebsite = ...;
     
-    pagesToScrap(path.join(__dirname, 'pageToScrap')).then(async pages => {
-         for await (const res of scrap("text to search", pages['target'])){
+    const asyncFn = async () => {
+         for await (const res of scrap("text to search", targetWebsite)){
             //do something with res...
          }
-         
-         process.exit(0);
     });
+    
+    asyncFn();
 
 The files loaded by the function _pagesToScrap(directory path)_ need to have the following structure:
  
@@ -260,7 +261,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Project Link: [https://github.com/](https://exemple.com)
+Project Link: 
+* [github](https://github.com/mazoutzecat/web-search-scrap)
+* [npmjs](https://www.npmjs.com/package/@mazoutzecat/web-search-scrap)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
