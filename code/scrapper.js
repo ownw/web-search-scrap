@@ -39,9 +39,9 @@ const browserOptions = {
 
 
 /**
- * Emule une navigation sur une/plusieurs page(s) web afin d'obtenir des valeurs spécifiées.
- * @param {string||string[]} toSearchFor - mot(s) à rechercher
- * @param {PageToScrap[]} pagesToScrap - site(s) web à analyser
+ * Emulates a navigation on one or more web pages in order to get targeted values.
+ * @param {string||string[]} toSearchFor - text to search
+ * @param {PageToScrap[]} pagesToScrap - web pages to analyse
  * @returns {AsyncGenerator<Object[]>}
  */
 const scrap = async function*(toSearchFor, ...pagesToScrap){
