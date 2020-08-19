@@ -193,7 +193,8 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
              */
             const searchResults = await Promise.all(page.xpathResults.map(xpath => findResultLinks(searchPage, xpath)))
                 .then(res => [...new Set([].concat(...res))]);
-            console.log("nb url: "+searchResults.length);
+            //console.log("nb url: "+searchResults.length);
+            log.info("found ["+searchResults.length+"] urls on results page ["+pageno+"]");
 
             /**
              * divise les urls trouvées en packs et lance l'analyse
@@ -213,7 +214,7 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
                                     });
                                 })
                             });
-                            console.log({
+                            /*console.log({
                                 chunks: k,
                                 pageNo: pageno,
                                 res: res.map(r => {
@@ -222,7 +223,7 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
                                         url: r.url
                                     });
                                 })
-                            });
+                            });*/
                             return res;
                         })
                         .catch(async err => {
@@ -249,7 +250,7 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
                 .then(res => {
                     pageno++;
                     log.info({msg: "navigation", pageNo: pageno, nextUrl: res.url()});
-                    console.log({msg: "navigation", pageNo: pageno, nextUrl: res.url()});
+                    //console.log({msg: "navigation", pageNo: pageno, nextUrl: res.url()});
                     return res;
                 })
                 .catch(err => {
