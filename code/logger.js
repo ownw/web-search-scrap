@@ -1,8 +1,12 @@
 const pino = require('pino');
 const pinoPretty = require('pino-pretty');
 const path = require('path');
+const fs = require('fs');
 
 const logsPath = path.join(".", "logs");
+if(!fs.existsSync(logsPath)){
+    fs.mkdirSync(logsPath);
+}
 
 /**
  * Creates a pino logger with the specified file name.
