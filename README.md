@@ -65,7 +65,7 @@ Also, be sure to have `git` available in your PATH, `npm` might need it (You can
 
 - #### Node installation on Ubuntu
 
-  You can install nodejs and npm easily with apt install, just run the following commands.
+You can install nodejs and npm easily with apt install, just run the following commands.
 
       $ sudo apt install nodejs
       $ sudo apt install npm
@@ -87,15 +87,14 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 
 ## Install
 
-    $ git clone https://github.com/mazoutzecat/web-search-scrap
-    $ cd web-search-scrap
+    $ npm install @mazoutzecat/web-search-scrap
     
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 The module has the following functions:
 
-    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('./scrapper/scrapper');
+    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@mazoutzecat/web-search-scrap');
     _______________
     
     scrap(toSearchFor:string|string[], pagesToScrap:...PageToScrap): AsyncGenerator<Object>
@@ -108,7 +107,7 @@ The module has the following functions:
 
 Your main file could look like this:
     
-    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('./scrapper/scrapper');
+    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@mazoutzecat/web-search-scrap');
      
     pagesToScrap(path.join(__dirname, 'pageToScrap')).then(async pages => {
          const pathFile = path.join('results', nameFile('json', "search1"));
@@ -122,7 +121,7 @@ Your main file could look like this:
 
 You can also directly use the results generated:
 
-    const {scrap, pagesToScrap} = require('./scrapper/scrapper');
+    const {scrap, pagesToScrap} = require('@mazoutzecat/web-search-scrap');
     
     pagesToScrap(path.join(__dirname, 'pageToScrap')).then(async pages => {
          for await (const res of scrap("text to search", pages['target'])){
@@ -229,7 +228,7 @@ This will yield the results (depending on the text searched):
 
 The documentation for each attribute utility is available in the code.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more examples, please refer to the [Documentation](https://github.com/mazoutzecat/web-search-scrap)_
 
 <!-- ROADMAP -->
 ## Roadmap
