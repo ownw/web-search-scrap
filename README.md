@@ -164,7 +164,7 @@ For example if the targeted website is amazon, the following values are suggeste
     {
       "name": "amazon",
       "url": "https://www.amazon.com",
-      "searchBarId": "#nav-search-label",
+      "searchBarId": "#twotabsearchtextbox",
       "xpathResults": [
         "//*[@data-component-type='s-search-result']//a[not(contains(@href, '#customerReviews') or contains(@href, 'javascript') or contains(@href, 'offer-listing') or contains(@href, 'bestsellers'))]"
       ],
