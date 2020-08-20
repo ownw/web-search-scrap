@@ -20,7 +20,27 @@ Object.defineProperty(Array.prototype, 'chunk', {value: function(n) {
  */
 const delay = async (t, data) => new Promise(r => setTimeout(r.bind(null,data), t));
 
-//const proxy = 'localhost:3000'
+/**
+ * Emulated browser's options.
+ * @see {@link https://pptr.dev/#?product=Puppeteer&version=v5.2.1&show=api-puppeteerlaunchoptions}
+ *
+ * @example
+ * //default values
+ * const browserOptions = {
+ *     args: [
+ *         '--no-sandbox',
+ *         '--disable-setuid-sandbox',
+ *         '--disable-dev-shm-usage',
+ *         '--disable-accelerated-2d-canvas',
+ *         '--disable-gpu',
+ *     ],
+ *     headless: false,
+ *     slowMo: 10,
+ *     defaultViewport: null
+ * }
+ *
+ * @type {Object} options -  Set of configurable options to set on the browser
+ */
 const browserOptions = {
     args: [
         //'--proxy-server='+proxy,
@@ -29,8 +49,6 @@ const browserOptions = {
         '--disable-dev-shm-usage',
         '--disable-accelerated-2d-canvas',
         '--disable-gpu',
-
-        //'--window-size=1920x1080'
     ],
     headless: false,
     slowMo: 10,
@@ -43,6 +61,22 @@ const browserOptions = {
  * @param {string||string[]} toSearchFor - text to search
  * @param {PageToScrap[]} pagesToScrap - web pages to analyse
  * @returns {AsyncGenerator<Object[]>}
+ * @see {@link PageToScrap}
+ * @see {@link pagesToScrap pagesToScrap(...)}
+ * @see {@link browserOptions}
+ * @see {@link saveJsonAsyncGenerator saveJsonAsyncGenerator(...)}
+ * @see {@link nameFile nameFile(...)}
+ *
+ * @example
+ * page = require('...'); //json file
+ * for await (const result of scrap("text", page)){
+ *     //do something with result
+ * }
+ * @example
+ * pagesToScrap(path.join(__dirname, 'pageToScrap')).then(async pages => {
+ *       const pathFile = path.join('results', nameFile('json', "..."));
+ *       await saveJsonAsyncGenerator(pathFile, scrap(["text to search", "other text to search"], pages['...']));
+ *  });
  */
 const scrap = async function*(toSearchFor, ...pagesToScrap){
     toSearchFor = (Array.isArray(toSearchFor)?toSearchFor:[toSearchFor]);
@@ -290,6 +324,7 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
 
 module.exports = {
     scrap: scrap,
+    browserOptions: browserOptions,
     saveJsonAsyncGenerator: saveJsonAsyncGenerator,
     pagesToScrap: pagesToScrap,
     nameFile: nameFile

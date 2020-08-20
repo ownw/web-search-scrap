@@ -1,9 +1,12 @@
 const fs = require("fs");
-const path = require("path");
 
 /**
  * Saves params data to the given file name.
  * @type {function(fileName:string, gens:...AsyncGenerator): Promise<void>}
+ * @example
+ * pathFile = ...
+ * await saveJsonAsyncGenerator(pathFile, scrap(...));
+ * await saveJsonAsyncGenerator(pathFile, scrap(...), scrap(...));
  */
 const saveJsonAsyncGenerator = async (pathFile, ...gens) => {
     await Promise.all(gens.map(async gen => {
