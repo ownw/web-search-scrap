@@ -1,10 +1,10 @@
 {
   "name": "@mazoutzecat/web-search-scrap",
-  "version": "0.1.3",
-  "description": "Scrap any content on any website that has a search bar",
+  "version": "0.1.4",
+  "description": "Scrap any content on any website that has a search bar.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "mocha --reporter progress"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,8 @@
     "pino": "^6.5.1",
     "pino-pretty": "^4.1.0",
     "puppeteer": "^5.2.1"
+  },
+  "devDependencies": {
+    "mocha": "^8.1.1"
   }
 }

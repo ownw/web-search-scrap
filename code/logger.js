@@ -4,15 +4,15 @@ const path = require('path');
 const fs = require('fs');
 
 const logsPath = path.join(".", "logs");
-if(!fs.existsSync(logsPath)){
-    fs.mkdirSync(logsPath);
-}
 
 /**
  * Creates a pino logger with the specified file name.
  * @type {function(fileName: string): Object}
  */
 const logger = (fn) => {
+    if(!fs.existsSync(logsPath)){
+        fs.mkdirSync(logsPath);
+    }
     const dest = pino.destination({dest: path.join(logsPath, fn), sync: false});
     return pino({
         prettyPrint: {
