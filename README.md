@@ -229,6 +229,37 @@ This will yield the results (depending on the text searched):
 
 The documentation for each attribute utility is available in the code.
 
+To search on Google, use:
+
+    {
+      "name": "google",
+      "url": "https://www.google.com/",
+      "searchBarId": "input.gLFyf.gsfi",
+      "xpathResults": [
+        ".//*[contains(@href, 'https://webcache.googleusercontent.com/search')]"
+      ],
+      "xpathPagination" : {
+        "next": "//*[@id=\"pnnext\"]"
+      },
+      "delayStrategy": {
+        "nbUrlPerChunk": 1,
+        "delayBetweenChunks": 20000
+      },
+      "disableIntercept": true,
+      "fields": [
+        ...
+      ],
+      "captcha": {
+        "xpath": "//*[@id='captcha-form']",
+        "retryIn": 250000,
+        "maxTries": 5
+      }
+    }
+
+with 
+
+    scrap("text site:targetedWebsite.com", page['google'])
+
 _For more examples, please refer to the [Documentation](https://github.com/mazoutzecat/web-search-scrap)_
 
 <!-- ROADMAP -->
