@@ -17,13 +17,13 @@
 Scrap any content on any website that has a search bar
 
 
-[Explore the docs »](https://github.com/mazoutzecat/web-search-scrap)
+[Explore the docs »](https://github.com/ownw/web-search-scrap)
 
-[View Demo](https://github.com/mazoutzecat/web-search-scrap)
+[View Demo](https://github.com/ownw/web-search-scrap)
 ·
-[Report Bug](https://github.com/mazoutzecat/web-search-scrap/issues)
+[Report Bug](https://github.com/ownw/web-search-scrap/issues)
 ·
-[Request Feature](https://github.com/mazoutzecat/web-search-scrap/issues)
+[Request Feature](https://github.com/ownw/web-search-scrap/issues)
 
 <!--
  <-- TABLE OF CONTENTS 
@@ -87,14 +87,14 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 
 ## Install
 
-    $ npm install @mazoutzecat/web-search-scrap
+    $ npm install @ownw/web-search-scrap
     
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 The module has the following functions:
 
-    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@mazoutzecat/web-search-scrap');
+    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@ownw/web-search-scrap');
     _______________
     
     scrap(toSearchFor:string|string[], pagesToScrap:...PageToScrap): AsyncGenerator<Object>
@@ -107,7 +107,7 @@ The module has the following functions:
 
 Your main file could look like this:
     
-    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@mazoutzecat/web-search-scrap');
+    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@ownw/web-search-scrap');
      
     pagesToScrap(path.join(__dirname, 'pageToScrap')).then(async pages => {
          const pathFile = path.join('results', nameFile('json', "search1"));
@@ -121,7 +121,7 @@ Your main file could look like this:
 
 You can also directly use the results generated:
 
-    const {scrap} = require('@mazoutzecat/web-search-scrap');
+    const {scrap} = require('@ownw/web-search-scrap');
     const targetWebsite = ...;
     
     const asyncFn = async () => {
@@ -260,12 +260,12 @@ with
 
     scrap("text site:targetedWebsite.com", page['google'])
 
-_For more examples, please refer to the [Documentation](https://github.com/mazoutzecat/web-search-scrap)_
+_For more examples, please refer to the [Documentation](https://github.com/ownw/web-search-scrap)_
 
 <!-- ROADMAP -->
 ## Roadmap
 
-See the [open issues](https://github.com/mazoutzecat/web-search-scrap/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/ownw/web-search-scrap/issues) for a list of proposed features (and known issues).
 
 
 
@@ -293,21 +293,21 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 Project Link: 
-* [github](https://github.com/mazoutzecat/web-search-scrap)
-* [npmjs](https://www.npmjs.com/package/@mazoutzecat/web-search-scrap)
+* [github](https://github.com/ownw/web-search-scrap)
+* [npmjs](https://www.npmjs.com/package/@ownw/web-search-scrap)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/mazoutzecat/web-search-scrap.svg?style=flat-square
-[contributors-url]: https://github.com/mazoutzecat/web-search-scrap/contributors
-[forks-shield]: https://img.shields.io/github/forks/mazoutzecat/web-search-scrap.svg?style=flat-square
-[forks-url]: https://github.com/mazoutzecat/web-search-scrap/network/members
-[stars-shield]: https://img.shields.io/github/stars/mazoutzecat/web-search-scrap.svg?style=flat-square
-[stars-url]: https://github.com/mazoutzecat/web-search-scrap/stargazers
-[issues-shield]: https://img.shields.io/github/issues/mazoutzecat/web-search-scrap.svg?style=flat-square
-[issues-url]: https://github.com/mazoutzecat/web-search-scrap/issues
-[license-shield]: https://img.shields.io/github/license/mazoutzecat/web-search-scrap.svg?style=flat-square
-[license-url]: https://github.com/mazoutzecat/web-search-scrap/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/ownw/web-search-scrap.svg?style=flat-square
+[contributors-url]: https://github.com/ownw/web-search-scrap/contributors
+[forks-shield]: https://img.shields.io/github/forks/ownw/web-search-scrap.svg?style=flat-square
+[forks-url]: https://github.com/ownw/web-search-scrap/network/members
+[stars-shield]: https://img.shields.io/github/stars/ownw/web-search-scrap.svg?style=flat-square
+[stars-url]: https://github.com/ownw/web-search-scrap/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ownw/web-search-scrap.svg?style=flat-square
+[issues-url]: https://github.com/ownw/web-search-scrap/issues
+[license-shield]: https://img.shields.io/github/license/ownw/web-search-scrap.svg?style=flat-square
+[license-url]: https://github.com/ownw/web-search-scrap/blob/master/LICENSE.txt
 
 [product-screenshot]: public/images/screenshot.png
 [mockup1]: images/mockup1.png

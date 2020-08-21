@@ -1,14 +1,14 @@
 {
-  "name": "@mazoutzecat/web-search-scrap",
+  "name": "@ownw/web-search-scrap",
   "version": "0.1.4",
   "description": "Scrap any content on any website that has a search bar.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter progress"
+    "test": "mocha --reporter spec"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mazoutzecat/web-search-scrap.git"
+    "url": "git+https://github.com/ownw/web-search-scrap.git"
   },
   "keywords": [
     "scrap"
@@ -16,9 +16,9 @@
   "author": "Matthieu Guillot <matthieu.guillot@neuf.fr>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mazoutzecat/web-search-scrap/issues"
+    "url": "https://github.com/ownw/web-search-scrap/issues"
   },
-  "homepage": "https://github.com/mazoutzecat/web-search-scrap#readme",
+  "homepage": "https://github.com/ownw/web-search-scrap#readme",
   "engines": {
     "node": ">=13.2.0"
   },
