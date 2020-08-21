@@ -14,7 +14,7 @@
 
 
 # web-search-scrap
-Scrap any content on any website that has a search bar
+Scrap any content on any website that has a search bar (using [Puppeteer](https://github.com/puppeteer/puppeteer)).
 
 
 [Explore the docs »](https://github.com/ownw/web-search-scrap)
