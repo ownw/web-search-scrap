@@ -28,7 +28,7 @@
  * @typedef {Object} PageToScrap
  * @property {string} name - name
  * @property {string} url - where the search bar is.
- * @property {string} searchBarId - search bar selector.
+ * @property {string} searchBarSelector - search bar selector.
  * @property {string[]} xpathResults - xpath selector for product links (should have a href attribute).
  * @property {Pagination} xpathPagination - xpath selector for pagination links (should have a href attribute).
  * @property {DelayStrategy} delayStrategy - how to slow down the analysis to ovoid being blocked by the target website.

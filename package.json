@@ -1,6 +1,6 @@
 {
   "name": "@ownw/web-search-scrap",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Scrap any content on any website that has a search bar.",
   "main": "index.js",
   "scripts": {
@@ -23,12 +23,12 @@
     "node": ">=13.2.0"
   },
   "dependencies": {
-    "moment": "^2.27.0",
-    "pino": "^6.5.1",
-    "pino-pretty": "^4.1.0",
-    "puppeteer": "^5.2.1"
+    "moment": "^2.29.1",
+    "pino": "^6.13.3",
+    "pino-pretty": "^7.0.1",
+    "puppeteer": "^10.4.0"
   },
   "devDependencies": {
-    "mocha": "^8.1.1"
+    "mocha": "^9.1.1"
   }
 }

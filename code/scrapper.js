@@ -6,6 +6,7 @@ const {intercept} = require("./intercept");
 const {saveJsonAsyncGenerator} = require("./result");
 const {nameFile} = require("./nameFile");
 const {pagesToScrap} = require("./urls");
+const {qos} = require("./qos");
 
 
 /**
@@ -50,8 +51,8 @@ const browserOptions = {
         '--disable-accelerated-2d-canvas',
         '--disable-gpu',
     ],
-    headless: false,
-    slowMo: 10,
+    headless: true,
+    slowMo: 15,
     defaultViewport: null
 };
 
@@ -80,8 +81,17 @@ const browserOptions = {
  */
 const scrap = async function*(toSearchFor, ...pagesToScrap){
     toSearchFor = (Array.isArray(toSearchFor)?toSearchFor:[toSearchFor]);
-    let resStream = new stream.PassThrough({objectMode:true});
-    const log = logger(nameFile("log", pagesToScrap.map(o => [o.name]).join('_')));
+    let resStream = new stream.PassThrough({objectMode: true});
+    let logStream = new stream.PassThrough({objectMode: true});
+    //const log = logger(nameFile("log", pagesToScrap.map(o => [o.name]).join('_')));//TODO
+    const log = logger(logStream);
+    logStream.on('data', (chunk) => {
+        resStream.write({
+            type: 'log',
+            value: chunk
+        });
+    });
+    const qosg = new qos();
 
     /**
      * S'occupe d'une recherche
@@ -92,31 +102,32 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
      * @generator
      * @yield {Object[]}
      */
-    const searchManager = async function* (t, b, page){
+    const searchManager = async function* (t, b, page, qost = null){
         log.info({page: page.name, text: t});
         const p = await intercept(await b.newPage(), page.disableIntercept);
 
         /**
          * lance une recherche sur le site concerné et se déplace vers la page de résultats
-         * @type {function(sp: Page, {url: string, searchBarId: string, text: string}):Promise<Page>}
+         * @type {function(sp: Page, {url: string, searchBarSelector: string, text: string}):Promise<Page>}
          */
-        const launchSearch = async (sp, {url, searchBarId, text}) => {
+        const launchSearch = async (sp, {url, searchBarSelector, text}) => {
             try {
                 await sp.goto(url, {waitUntil: "networkidle2"});
-                await sp.type(searchBarId, text);
+                await sp.type(searchBarSelector, text);
+                await delay(600);
                 await sp.keyboard.press('Enter');
                 await sp.waitForNavigation({waitUntil: "networkidle2"});
                 return sp;
             } catch (e) {
-                log.error({msg: e.msg, url: url, searchBarId: searchBarId, text: text});
+                log.error({msg: e.msg, url: url, searchBarSelector: searchBarSelector, text: text});
                 log.error(e);
                 await delay(5000);
-                return launchSearch(sp, {url, searchBarId, text});
+                return launchSearch(sp, {url, searchBarSelector, text});
             }
         };
         const searchPage = await launchSearch(p, {
             "url": page.url,
-            "searchBarId": page.searchBarId,
+            "searchBarSelector": page.searchBarSelector,
             "text": t
         })
         log.info({searchPage: searchPage.url()});
@@ -133,21 +144,6 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
                 .then(res => Promise.all(res))
                 .then(res => (res.length > 0) ? ((res.length === 1) ? res[0] : res) : null)
                 .catch(e => log.warn({msg: e.message, url: sp.url(), field: field.name, lineNumber: e.lineNumber}))
-        };
-
-        /**
-         * Trouve les liens de pagination des pages de résultats.
-         * @type {function(Page, Pagination): Promise<Object>}
-         */
-        const findLinksPagination = async (sp, xpPag) => {
-            let obj = {};
-            return Promise.all(Object.entries(xpPag)
-                .map(async ([k, v]) => obj[k] = await findFieldOnPage(sp, {
-                    "name": k,
-                    "xpath": v,
-                    "htmlProperty": "href"
-                }))
-            ).then(_ => obj);
         };
 
         /**
@@ -191,8 +187,8 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
                 if(await detectCaptcha(page, captcha)){throw new Error("captcha error");}
                 return page;
             }catch (err){
-                log.warn({msg: "captcha detected", url: url, retryIn: captcha.retryIn, tryNumber: tryNumber});
-                console.warn({msg: "captcha detected", url: url, retryIn: captcha.retryIn, tryNumber: tryNumber});
+                log.warn({msg: "Error in goto", url: url, retryIn: captcha.retryIn, tryNumber: tryNumber});
+                console.warn({msg: "Error in goto", url: url, retryIn: captcha.retryIn, tryNumber: tryNumber});
                 if(tryNumber>=captcha.maxTries){throw err;}
                 await delay(captcha.retryIn);
                 return gotoSafeCaptcha(page, url, captcha, tryNumber+1);
@@ -219,16 +215,45 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
             }
         };
 
+        /**
+         * Navigue sur le lien de pagination de la page suivante
+         * @param {Page} sp
+         * @param {Pagination} xpPag
+         * @param {Captcha} captcha
+         * @returns {Promise<Page|null|*>}
+         */
+        const gotoLinkPagination = async(sp, xpPag, captcha) => {
+            if(!xpPag.clickOnLink){
+                let urlPag = await findFieldOnPage(sp, {"name": "next", "xpath": xpPag.next, "htmlProperty": "href"})
+                    .then(url => (Array.isArray(url)?url[0]:url));
+                if(!urlPag){throw new Error("pagination url null");}
+                return await gotoSafeCaptcha(
+                    sp,
+                    urlPag,
+                    captcha
+                );
+            } else {
+                await sp.$x(xpPag.next).then(res => res[0].click());
+                return sp;
+            }
+        };
+
         let pageno = 0, keepNav = true;
+        let urlExplored = [];
         do {
+            let qosp = qost.child("page "+pageno);
+            page.fields.map(value => qosp.fields.add(value.name));
             /**
              * trouve les liens vers les pages produits depuis la page de résultats de recherche (et élimine les doublons)
              * @type {function(xp: string, sp: Page): Promise<string[]>}
              */
             const searchResults = await Promise.all(page.xpathResults.map(xpath => findResultLinks(searchPage, xpath)))
-                .then(res => [...new Set([].concat(...res))]);
+                .then(res => [...new Set([].concat(...res))])
+                .then(res => res.filter(url => !urlExplored.includes(url)));
             //console.log("nb url: "+searchResults.length);
-            log.info("found ["+searchResults.length+"] urls on results page ["+pageno+"]");
+            log.info("found ["+searchResults.length+"] urls on results page ["+pageno+"]");//TODO
+            qosp.resExp = searchResults.length;
+            urlExplored.concat(...searchResults);
 
             /**
              * divise les urls trouvées en packs et lance l'analyse
@@ -262,6 +287,7 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
                         })
                         .catch(async err => {
                             log.error(err);
+                            qosp.err += 1;
                         });
                     await delay(delayStrategy.delayBetweenChunks || 1000);
                 }
@@ -271,28 +297,34 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
              * renvoi les résultats
              */
             for await (const res of fieldsResults(searchResults, b, page.fields, page.delayStrategy)) {
-                yield (res)?res.filter(n => (n) ? n[page.fields[0].name] : false):res;
+                yield (res)? res.filter(n => (n) ? n[page.fields[0].name] : false) : res;
+                //qosp.res += (res.map(value => (value)?(value.length-1)/page.fields.length:0)).reduce((tot, val) => tot+val, 0);
+                qosp.res += (res.map(value => (value)?((Object.entries(value).map(([k,v]) => !!v).length-1)/page.fields.length):0))
+                    .reduce((tot, val) => tot+val, 0);
+                res.map(value => (value)?page.fields.map(field => qosp.fields[field.name] += (value[field.name])?1:0):false);
             }
 
             /**
-             * trouve le lien de la prochaine page de résultats et se déplace vers celle-ci
-             * sort du do...while si ne detecte pas de lien de pagination
+             * Navigue à la prochaine page de résultat
+             * Sort de la boucle do...while() si erreur (lien non-trouvé)
              */
-            await findLinksPagination(searchPage, page.xpathPagination)
-                .then(res => {if(!res.next){throw new Error("next url null");} return res;})
-                .then(async res => await gotoSafeCaptcha(searchPage, res.next, page.captcha))
+            await gotoLinkPagination(searchPage, page.xpathPagination, page.captcha)
                 .then(res => {
                     pageno++;
+                    qosp.time.end();
                     log.info({msg: "navigation", pageNo: pageno, nextUrl: res.url()});
                     //console.log({msg: "navigation", pageNo: pageno, nextUrl: res.url()});
                     return res;
                 })
+                .then(async res => await delay(2000, res))
                 .catch(err => {
                     log.warn(err);
                     return keepNav = false;
                 });
         }while (keepNav);
         searchPage.close();
+        log.info({msg: "End of search", page: page.name, text: t});
+        qost.time.end();
         return {done: true};
     }
 
@@ -301,15 +333,30 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
      */
     Promise.all(pagesToScrap.map(async (page) => {
         const browser = await puppeteer.launch(browserOptions);
+        const qosp = qosg.child(page.name);
         /**
          * lance la recherche pour chaque texte à rechercher
          * recherche séquentielle
          */
         for(let t of toSearchFor){
-            let dataStream = stream.Readable.from(searchManager(t, browser, page),{objectMode: true});
-            dataStream.on('data', (chunk) => resStream.write(chunk));
-            await new Promise((resolve => dataStream.on('end', ()=>resolve(true))));
+            const qost = qosp.child(t);
+            let dataStream = stream.Readable.from(searchManager(t, browser, page, qost),{objectMode: true});
+            dataStream.on('data', (chunk) => {
+                resStream.write({
+                    type: 'data',
+                    value: chunk
+                });
+                //qost.res += chunk.length;
+                resStream.write({
+                    type: 'qos',
+                    value: qosg.export()
+                });
+            });
+
+            await new Promise((resolve => dataStream.on('end', () => resolve(true))));
         }
+        await browser.close();
+        qosp.time.end();
     })).then(_ => resStream.end());
 
     /**
@@ -318,14 +365,16 @@ const scrap = async function*(toSearchFor, ...pagesToScrap){
     for await (const chunk of resStream){
         yield chunk;
     }
+    qosg.time.end();
     return {done: true};
 }
 
 
 module.exports = {
-    scrap: scrap,
-    browserOptions: browserOptions,
-    saveJsonAsyncGenerator: saveJsonAsyncGenerator,
-    pagesToScrap: pagesToScrap,
-    nameFile: nameFile
+    scrap,
+    browserOptions,
+    saveJsonAsyncGenerator,
+    pagesToScrap,
+    nameFile,
+    qos
 };

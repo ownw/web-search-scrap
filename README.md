@@ -61,7 +61,7 @@ You can specify any number of websites to explore, any text to search as well as
 - #### Node installation on Windows
 
   Just go on [official Node.js website](https://nodejs.org/) and download the installer.
-Also, be sure to have `git` available in your PATH, `npm` might need it (You can find git [here](https://git-scm.com/)).
+  Also, be sure to have `git` available in your PATH, `npm` might need it (You can find git [here](https://git-scm.com/)).
 
 - #### Node installation on Ubuntu
 
@@ -76,10 +76,10 @@ You can install nodejs and npm easily with apt install, just run the following c
 If the installation was successful, you should be able to run the following command.
 
     $ node --version
-    v8.11.3
+    v14.17.6
 
     $ npm --version
-    6.1.0
+    7.24.1
 
 If you need to update `npm`, you can make it using `npm`! Cool right? After running the following command, just open again the command line and be happy.
 
@@ -88,36 +88,53 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 ## Install
 
     $ npm install @ownw/web-search-scrap
-    
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 The module has the following functions:
 
-    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@ownw/web-search-scrap');
+    const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile, qos} = require('@ownw/web-search-scrap');
     _______________
     
+    //starts the scrapping
     scrap(toSearchFor:string|string[], pagesToScrap:...PageToScrap): AsyncGenerator<Object>
     
-    saveJsonAsyncGenerator(fileName:string, gens:...AsyncGenerator): Promise<void>
+    //save results to a directory
+    saveJsonAsyncGenerator(fileDir:string, gens:...AsyncGenerator): Promise<void>
     
+    //loads all config files
     pagesToScrap(directoryName:string): Promise<PageToScrap[]>
     
-    nameFile(ext:string, names:...string): string
+    //generates a name with the current date
+    nameFile(names:...string): string
 
 Your main file could look like this:
-    
+
     const {scrap, saveJsonAsyncGenerator, pagesToScrap, nameFile} = require('@ownw/web-search-scrap');
      
     pagesToScrap(path.join(__dirname, 'pageToScrap')).then(async pages => {
-         const pathFile = path.join('results', nameFile('json', "search1"));
-         await saveJsonAsyncGenerator(pathFile, scrap(["text to search", "other text to search"], pages['target1']));
+         const pathDir = path.join('results', nameFile("search1"));
+         await saveJsonAsyncGenerator(pathDir, scrap(["text to search", "other text to search"], pages['target1']));
         
-         const pathFile2 = path.join('results', nameFile('json', "search2"));
-         await saveJsonAsyncGenerator(pathFile2, scrap("text to search", pages['target1'], pages['target2']));
+         const pathDir2 = path.join('results', nameFile("search2"));
+         await saveJsonAsyncGenerator(pathDir2, scrap("text to search", pages['target1'], pages['target2']));
          
          process.exit(0);
     });
+
+Using the function `saveJsonAsyncGenerator()` will save to the specified directory 3 files. Let say you have this code:
+
+    pathDir = 'out' 
+    pathSearch = path.join(pathDir, nameFile('search'))
+    targetPage = ...
+    saveJsonAsyncDirectory(pathSearch, scrap([...], targetPage)
+    ---    
+    You will have the following files:
+    out/[date].search/
+                    ->[date].search.json
+                    ->[date].search.log
+                    ->[date].search.qos
 
 You can also directly use the results generated:
 
@@ -127,17 +144,21 @@ You can also directly use the results generated:
     const asyncFn = async () => {
          for await (const res of scrap("text to search", targetWebsite)){
             //do something with res...
+            //res.type = ('data'|'log'|'qos')
+            //  ->data: contains the actual data (use res.value)
+            //  ->log: contains the log
+            //  ->qos: contains metrics for the search
          }
     });
     
     asyncFn();
 
 The files loaded by the function _pagesToScrap(directory path)_ need to have the following structure:
- 
+
     {
         "name": ...,
         "url": ...,
-        "searchBarId": ...,
+        "searchBarSelector": ...,
         "xpathResults": [...],
         "xpathPagination": {"next": ...},
         "disableIntercept": true/false,
@@ -165,7 +186,7 @@ For example if the targeted website is amazon, the following values are suggeste
     {
       "name": "amazon",
       "url": "https://www.amazon.com",
-      "searchBarId": "#twotabsearchtextbox",
+      "searchBarSelector": "#twotabsearchtextbox",
       "xpathResults": [
         "//*[@data-component-type='s-search-result']//a[not(contains(@href, '#customerReviews') or contains(@href, 'javascript') or contains(@href, 'offer-listing') or contains(@href, 'bestsellers'))]"
       ],
@@ -234,7 +255,7 @@ To search on Google, use:
     {
       "name": "google",
       "url": "https://www.google.com/",
-      "searchBarId": "input.gLFyf.gsfi",
+      "searchBarSelector": "input.gLFyf.gsfi",
       "xpathResults": [
         ".//*[contains(@href, 'https://webcache.googleusercontent.com/search')]"
       ],
@@ -256,7 +277,7 @@ To search on Google, use:
       }
     }
 
-with 
+with
 
     scrap("text site:targetedWebsite.com", page['google'])
 
@@ -292,7 +313,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Project Link: 
+Project Link:
 * [github](https://github.com/ownw/web-search-scrap)
 * [npmjs](https://www.npmjs.com/package/@ownw/web-search-scrap)
 
